@@ -57,6 +57,9 @@ function initAdminPage() {
     const refreshBtn = document.getElementById('refreshBtn');
     refreshBtn.addEventListener('click', loadContacts);
     
+    const logoutBtn = document.getElementById('logoutBtn');
+    logoutBtn.addEventListener('click', handleLogout);
+    
     const editForm = document.getElementById('editForm');
     editForm.addEventListener('submit', handleEditSubmit);
     
@@ -71,9 +74,34 @@ function initAdminPage() {
     });
 }
 
+async function handleLogout() {
+    if (confirm('คุณแน่ใจหรือไม่ที่ต้องการออกจากระบบ?')) {
+        try {
+            const response = await fetch('/api/admin/logout', {
+                method: 'POST'
+            });
+            
+            if (response.ok) {
+                window.location.href = '/login';
+            } else {
+                showMessage('เกิดข้อผิดพลาดในการออกจากระบบ', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+        }
+    }
+}
+
 async function loadContacts() {
     try {
         const response = await fetch('/api/contacts');
+        
+        if (response.status === 401 || response.redirected) {
+            window.location.href = '/login';
+            return;
+        }
+        
         const contacts = await response.json();
         
         if (response.ok) {

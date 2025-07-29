@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบแอดมิน</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>เข้าสู่ระบบแอดมิน</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="password">รหัสผ่าน:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">เข้าสู่ระบบ</button>
+            </form>
+            
+            <div id="message" class="message"></div>
+            
+            <div class="admin-link">
+                <a href="/">กลับไปหน้าหลัก</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const form = document.getElementById('loginForm');
+        const messageDiv = document.getElementById('message');
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            
+            if (!password) {
+                showMessage('กรุณากรอกรหัสผ่าน', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ password })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showMessage('เข้าสู่ระบบสำเร็จ กำลังเปลี่ยนหน้า...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/admin';
+                    }, 1000);
+                } else {
+                    showMessage(result.error, 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์', 'error');
+            }
+        });
+        
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                if (type === 'error') {
+                    messageDiv.style.display = 'none';
+                }
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
