@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: contact-database-app
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+    autoDeploy: false
+
+databases:
+  - name: contact-database
+    databaseName: contact_db
+    user: contact_user
+    plan: free

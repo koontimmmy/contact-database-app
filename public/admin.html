@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการข้อมูลติดต่อ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="admin-container">
+            <div class="header">
+                <h1>ระบบจัดการข้อมูลติดต่อ</h1>
+                <div class="header-actions">
+                    <button id="refreshBtn" class="btn btn-secondary">รีเฟรช</button>
+                    <a href="/" class="btn btn-primary">กลับไปหน้าหลัก</a>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <h3>จำนวนข้อมูลทั้งหมด</h3>
+                    <span id="totalContacts">0</span>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table id="contactsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ชื่อ-นามสกุล</th>
+                            <th>เบอร์โทรศัพท์</th>
+                            <th>อีเมล</th>
+                            <th>วันที่สร้าง</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contactsBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="message" class="message"></div>
+        </div>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>แก้ไขข้อมูลติดต่อ</h2>
+                <span class="close">&times;</span>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editId">
+                <div class="form-group">
+                    <label for="editName">ชื่อ-นามสกุล:</label>
+                    <input type="text" id="editName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPhone">เบอร์โทรศัพท์:</label>
+                    <input type="tel" id="editPhone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">อีเมล:</label>
+                    <input type="email" id="editEmail" name="email" required>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

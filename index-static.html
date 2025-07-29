@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ฟอร์มข้อมูลติดต่อ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #4a5568;
+            font-size: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        input[type="email"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="tel"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            background-color: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .message.error {
+            background-color: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .data-list {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .data-item {
+            background: #f7fafc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .data-item h3 {
+            margin-bottom: 5px;
+            color: #4a5568;
+        }
+
+        .data-item p {
+            margin: 2px 0;
+            color: #718096;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>กรอกข้อมูลติดต่อ</h1>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">ชื่อ-นามสกุล:</label>
+                    <input type="text" id="name" name="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">เบอร์โทรศัพท์:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">อีเมล:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                
+                <button type="submit" class="submit-btn">บันทึกข้อมูล</button>
+            </form>
+            
+            <div id="message" class="message"></div>
+            
+            <div class="data-list">
+                <h2>ข้อมูลที่บันทึกแล้ว:</h2>
+                <div id="dataContainer"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Use localStorage for simple data storage
+        const form = document.getElementById('contactForm');
+        const messageDiv = document.getElementById('message');
+        const dataContainer = document.getElementById('dataContainer');
+        
+        // Load saved data on page load
+        loadSavedData();
+        
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(form);
+            const data = {
+                id: Date.now(),
+                name: formData.get('name').trim(),
+                phone: formData.get('phone').trim(),
+                email: formData.get('email').trim(),
+                created_at: new Date().toLocaleString('th-TH')
+            };
+            
+            if (!data.name || !data.phone || !data.email) {
+                showMessage('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(data.email)) {
+                showMessage('รูปแบบอีเมลไม่ถูกต้อง', 'error');
+                return;
+            }
+            
+            // Save to localStorage
+            saveContact(data);
+            showMessage('บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
+            form.reset();
+            loadSavedData();
+        });
+        
+        function saveContact(contact) {
+            let contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+            contacts.push(contact);
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+        }
+        
+        function loadSavedData() {
+            const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+            dataContainer.innerHTML = '';
+            
+            if (contacts.length === 0) {
+                dataContainer.innerHTML = '<p style="text-align: center; color: #a0aec0;">ยังไม่มีข้อมูล</p>';
+                return;
+            }
+            
+            contacts.reverse().forEach(contact => {
+                const item = document.createElement('div');
+                item.className = 'data-item';
+                item.innerHTML = `
+                    <h3>${escapeHtml(contact.name)}</h3>
+                    <p><strong>เบอร์:</strong> ${escapeHtml(contact.phone)}</p>
+                    <p><strong>อีเมล:</strong> ${escapeHtml(contact.email)}</p>
+                    <p><strong>วันที่:</strong> ${contact.created_at}</p>
+                `;
+                dataContainer.appendChild(item);
+            });
+        }
+        
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+        
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+    </script>
+</body>
+</html>
